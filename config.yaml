@@ -1,0 +1,30 @@
+# Konfigurácia pipeline-u
+
+detection:
+  model_path: "models/yolov8n.pt"   # nahraď fine-tunovaným modelom neskôr
+  confidence: 0.35
+  classes:
+    player: 0
+    ball: 1
+    referee: 2
+
+tracking:
+  tracker: "bytetrack"   # bytetrack | deepsort
+  track_thresh: 0.5
+  match_thresh: 0.8
+  track_buffer: 30
+
+pose:
+  enabled: true
+  model_complexity: 1   # 0 = lite, 1 = full, 2 = heavy (MediaPipe)
+
+homography:
+  enabled: false   # zapni v Fáze 2, keď máš referenčné body ihriska
+  pitch_length_m: 105
+  pitch_width_m: 68
+
+output:
+  draw_boxes: true
+  draw_tracks: true
+  draw_pose: true
+  save_json: true

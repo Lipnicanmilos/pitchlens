@@ -1,0 +1,22 @@
+# Core CV / ML
+ultralytics>=8.2.0
+opencv-python>=4.9.0
+supervision>=0.21.0
+numpy>=1.26.0
+pandas>=2.2.0
+
+# Pose estimation
+mediapipe>=0.10.14
+
+# Tracking (ByteTrack is bundled via supervision/ultralytics;
+# boxmot is an alternative with more tracker options)
+boxmot>=11.0.0
+
+# Visualization / utils
+matplotlib>=3.8.0
+pyyaml>=6.0.1
+tqdm>=4.66.0
+
+# Optional: for API/backend wrapping later
+fastapi>=0.111.0
+uvicorn>=0.30.0
