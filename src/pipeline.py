@@ -29,10 +29,9 @@ def load_config(path: str) -> dict:
 def run_pipeline(video_path: str, output_path: str, config_path: str = "config.yaml"):
     config = load_config(config_path)
 
-    detector = Detector(
-        model_path=config["detection"]["model_path"],
-        confidence=config["detection"]["confidence"],
-    )
+    detector = Detector.from_config(config["detection"])
+    player_class_id = config["detection"]["classes"]["player"]
+
     tracker = Tracker(
         track_thresh=config["tracking"]["track_thresh"],
         match_thresh=config["tracking"]["match_thresh"],
@@ -82,8 +81,8 @@ def run_pipeline(video_path: str, output_path: str, config_path: str = "config.y
                     "bbox": [float(x1), float(y1), float(x2), float(y2)],
                 }
 
-                # Voliteľná pose estimation na výreze hráča
-                if pose_estimator is not None:
+                # Voliteľná pose estimation - len na hráčoch, nie na lopte
+                if pose_estimator is not None and class_id == player_class_id:
                     crop = frame[int(y1):int(y2), int(x1):int(x2)]
                     if crop.size > 0:
                         pose_result = pose_estimator.estimate(crop)

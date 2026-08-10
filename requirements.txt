@@ -1,11 +1,15 @@
 # Core CV / ML
 ultralytics>=8.2.0
 opencv-python>=4.9.0
-supervision>=0.21.0
+# <0.31: sv.ByteTrack je od 0.28 deprecated a v 0.31 ho odstránia.
+# Pred odblokovaním stropu treba src/track.py prepísať na boxmot.
+supervision>=0.21.0,<0.31
 numpy>=1.26.0
 pandas>=2.2.0
 
-# Pose estimation
+# Pose estimation (Fáza 4)
+# POZOR: mediapipe 1.0 odstránilo legacy `mp.solutions` API, ktoré src/pose.py
+# používa. Buď daj sem 'mediapipe<1.0', alebo prepíš pose.py na Tasks API.
 mediapipe>=0.10.14
 
 # Tracking (ByteTrack is bundled via supervision/ultralytics;

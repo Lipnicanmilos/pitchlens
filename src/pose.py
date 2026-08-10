@@ -26,6 +26,19 @@ class PoseResult:
 
 class PoseEstimator:
     def __init__(self, model_complexity: int = 1):
+        if not hasattr(mp, "solutions"):
+            raise RuntimeError(
+                f"mediapipe {mp.__version__} odstránilo legacy `mp.solutions` API, "
+                "na ktorom stojí tento modul (v 1.0 zostalo len Image/ImageFormat/tasks).\n"
+                "Možnosti:\n"
+                "  a) pip install 'mediapipe<1.0' — rýchle, ale legacy API už Google neudržiava\n"
+                "  b) prepísať tento modul na Tasks API "
+                "(mediapipe.tasks.python.vision.PoseLandmarker), čo vyžaduje stiahnuť\n"
+                "     model pose_landmarker_*.task\n"
+                "Dovtedy nechaj v config.yaml `pose.enabled: false` — MVP (Fáza 1) "
+                "pose nepotrebuje."
+            )
+
         self.mp_pose = mp.solutions.pose
         self.pose = self.mp_pose.Pose(
             model_complexity=model_complexity,
@@ -38,7 +51,10 @@ class PoseEstimator:
         player_crop: výrez obrazu okolo jedného hráča (BGR, np.ndarray)
         Vráti landmarky a hrubý odhad orientácie trupu.
         """
-        rgb = player_crop[:, :, ::-1]  # BGR -> RGB
+        # BGR -> RGB. ascontiguousarray je nutné: `[:, :, ::-1]` vráti pohľad so
+        # záporným krokom a MediaPipe vyžaduje súvislé pole (inak spadne na
+        # "Image data must be contiguous").
+        rgb = np.ascontiguousarray(player_crop[:, :, ::-1])
         results = self.pose.process(rgb)
 
         if not results.pose_landmarks:

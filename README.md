@@ -61,8 +61,27 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Stiahni si predtrénované YOLO váhy (napr. `yolov8n.pt`) do `models/`,
-alebo fine-tuni vlastný model na dátach zo SoccerNet (https://www.soccer-net.org/).
+Stiahni si predtrénované YOLO váhy do `models/`:
+
+```bash
+curl -L -o models/yolov8n.pt https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt
+```
+
+### Mapovanie tried (dôležité)
+
+`yolov8n.pt` je predtrénovaný na COCO a triedy `player`/`ball`/`referee`
+nepozná — COCO trieda 0 je `person` a 32 je `sports ball`. Pipeline preto
+prekladá COCO triedy na projektové cez `detection.coco_fallback.map`
+v `config.yaml` a všetko ostatné zahadzuje.
+
+Dôsledky tohto provizória:
+- **rozhodca sa nerozlíši od hráča** – COCO to nevie, všetky osoby padnú do `player`
+- **diváci v hľadisku sú tiež `person`** – čiastočne ich odreže `min_box_height`,
+  ale spoľahlivé riešenie je až fine-tuning
+
+Keď si model fine-tuneš na futbalových dátach (SoccerNet,
+https://www.soccer-net.org/), nastav `coco_fallback.enabled: false` a model
+bude vracať projektové triedy priamo.
 
 ## Spustenie MVP (detekcia + tracking)
 

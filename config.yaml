@@ -3,10 +3,28 @@
 detection:
   model_path: "models/yolov8n.pt"   # nahraď fine-tunovaným modelom neskôr
   confidence: 0.35
+
+  # Projektové triedy (toto sú class_id, ktoré vidí zvyšok pipeline-u)
   classes:
     player: 0
     ball: 1
     referee: 2
+
+  # yolov8n.pt je predtrénovaný na COCO a triedy player/ball/referee nepozná.
+  # Kým nemáš vlastný fine-tunovaný model, prekladáme COCO triedy na naše
+  # a všetko ostatné (autá, lavičky, davy predmetov) zahadzujeme.
+  # Po fine-tuningu na SoccerNet daj enabled: false
+  coco_fallback:
+    enabled: true
+    map:
+      0: 0     # COCO 'person'      -> player
+      32: 1    # COCO 'sports ball' -> ball
+    # POZOR: COCO nevie odlíšiť rozhodcu od hráča — všetky osoby padnú do
+    # 'player'. Rozhodca (trieda 2) sa objaví až s fine-tunovaným modelom.
+
+    # Divákov v hľadisku COCO tiež deteguje ako 'person'. Filter zahodí boxy
+    # menšie ako toto (v pixeloch) — hrubé, ale na TV zábere odreže tribúnu.
+    min_box_height: 25
 
 tracking:
   tracker: "bytetrack"   # bytetrack | deepsort
@@ -15,7 +33,10 @@ tracking:
   track_buffer: 30
 
 pose:
-  enabled: true
+  # Vypnuté: pose je až Fáza 4, MVP ho nepotrebuje. Navyše mediapipe 1.0
+  # odstránilo legacy `mp.solutions` API, na ktorom src/pose.py stojí —
+  # pred zapnutím treba buď mediapipe<1.0, alebo prepis na Tasks API.
+  enabled: false
   model_complexity: 1   # 0 = lite, 1 = full, 2 = heavy (MediaPipe)
 
 homography:
